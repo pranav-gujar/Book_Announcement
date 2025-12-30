@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loser, Am I? | Pranav Gujar</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Inter:wght@300;400&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- KEEP ALL YOUR EXISTING CSS EXACTLY AS IS --- */
+        /* (I am hiding it here to save space, but paste your original CSS style block here) */
+        
+        :root { --bg-color: #050505; --text-primary: #e0e0e0; --text-muted: #888; --gold: #c5a059; --gold-dim: #8a6e36; --glass: rgba(255, 255, 255, 0.03); --border: rgba(255, 255, 255, 0.08); }
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
+        body { background-color: var(--bg-color); color: var(--text-primary); font-family: 'Inter', sans-serif; overflow-x: hidden; line-height: 1.8; }
+        .grain-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E"); pointer-events: none; z-index: 9000; opacity: 0.4; }
+        #cursor { position: fixed; top: 0; left: 0; width: 8px; height: 8px; background: var(--gold); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); box-shadow: 0 0 15px var(--gold); transition: width 0.3s, height 0.3s, background 0.3s; mix-blend-mode: difference; }
+        #cursor-follower { position: fixed; top: 0; left: 0; width: 40px; height: 40px; border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; pointer-events: none; transform: translate(-50%, -50%); z-index: 9998; transition: all 0.1s ease-out; }
+        body.hovered #cursor { width: 40px; height: 40px; opacity: 1; background: #fff; mix-blend-mode: normal; }
+        body.hovered #cursor-follower { width: 55px; height: 55px; border-color: var(--gold); opacity: 0.6; }
+        #dust-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.5; }
+        h1, h2, h3 { font-family: 'Playfair Display', serif; font-weight: 400; }
+        .cinzel { font-family: 'Cinzel', serif; letter-spacing: 3px; }
+        .fade-in-up { opacity: 0; transform: translateY(40px); transition: all 1.2s cubic-bezier(0.165, 0.84, 0.44, 1); }
+        .fade-in-up.visible { opacity: 1; transform: translateY(0); }
+        header { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; position: relative; }
+        .author-badge { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 6px; color: var(--gold); margin-bottom: 2.5rem; position: relative; padding-bottom: 15px; }
+        .author-badge::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 40px; height: 1px; background: var(--gold); }
+        .hero-title { font-size: clamp(3.5rem, 10vw, 7.5rem); line-height: 1; margin-bottom: 1.5rem; background: linear-gradient(to bottom, #fcfcfc 0%, #c5a059 60%, #8a6e36 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 40px rgba(197, 160, 89, 0.15)); }
+        .hero-subtitle { font-size: clamp(1.1rem, 2.5vw, 1.8rem); color: var(--text-muted); font-style: italic; font-weight: 300; letter-spacing: 1px; }
+        .book-section { padding: 120px 5%; display: flex; flex-direction: column; align-items: center; }
+        .book-container-3d { width: 280px; height: 420px; position: relative; perspective: 1500px; margin: 60px 0; }
+        .book-cover { width: 100%; height: 100%; position: absolute; transform-style: preserve-3d; border-radius: 4px; box-shadow: 0 30px 60px rgba(0,0,0,0.9); background-color: #0a0a0a; background-image: url('images/cover.png'); background-size: cover; background-position: center; border: 1px solid rgba(255,255,255,0.1); }
+        .book-cover::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%); pointer-events: none; }
+        .book-spine { position: absolute; top: 0; left: 0; width: 30px; height: 100%; background: #1a1a1a; transform: rotateY(-90deg) translateZ(15px); transform-origin: left; border-left: 1px solid rgba(255,255,255,0.1); }
+        .quote-block { max-width: 650px; text-align: center; margin-top: 60px; padding: 40px; position: relative; }
+        .quote-block::before { content: '"'; position: absolute; top: 0; left: 50%; transform: translateX(-50%); font-family: 'Playfair Display', serif; font-size: 6rem; color: var(--glass); line-height: 0.5; }
+        .quote-text { font-size: 1.35rem; color: #ccc; font-family: 'Playfair Display', serif; margin-bottom: 25px; font-style: italic; }
+        .quote-author { color: var(--gold); font-size: 0.8rem; letter-spacing: 3px; text-transform: uppercase; font-family: 'Inter', sans-serif;}
+        .trailer-section { padding: 100px 5%; text-align: center; border-top: 1px solid var(--border); }
+        .video-wrapper { max-width: 900px; margin: 50px auto; position: relative; border-radius: 2px; overflow: hidden; box-shadow: 0 0 80px rgba(0,0,0,0.9); border: 1px solid var(--border); aspect-ratio: 16/9; background: #000; }
+        
+        /* UPDATED OVERLAY FOR SMOOTHER TRANSITION */
+        .video-overlay { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            /* Ensure this image exists in your folder! */
+            background-image: url('images/trailer.jpg'); 
+            background-size: cover; background-position: center; 
+            display: flex; justify-content: center; align-items: center; 
+            transition: opacity 1s ease; /* Slower fade out */
+            z-index: 2; 
+        }
+        .play-btn { width: 70px; height: 70px; border: 1px solid var(--gold); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: var(--gold); font-size: 1.2rem; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); }
+        .video-wrapper:hover .play-btn { transform: scale(1.15); background: var(--gold); color: #000; box-shadow: 0 0 30px var(--gold); }
+        .video-wrapper.playing .video-overlay { opacity: 0; pointer-events: none; }
+        
+        .works-section { padding: 120px 5%; background: linear-gradient(to top, #020202, #050505); border-top: 1px solid var(--border); }
+        .works-grid { display: flex; justify-content: center; gap: 60px; flex-wrap: wrap; margin-top: 70px; }
+        .work-card { width: 260px; padding: 25px; background: rgba(255,255,255,0.015); border: 1px solid var(--border); border-radius: 4px; text-align: center; transition: 0.5s cubic-bezier(0.2, 1, 0.3, 1); position: relative; }
+        .work-card:hover { border-color: var(--gold-dim); transform: translateY(-15px); background: rgba(255,255,255,0.03); box-shadow: 0 30px 50px rgba(0,0,0,0.8); }
+        .work-img { width: 100%; border-radius: 2px; margin-bottom: 25px; transition: 0.5s; box-shadow: 0 10px 20px rgba(0,0,0,0.5); filter: grayscale(100%) brightness(0.8); }
+        .work-card:hover .work-img { filter: grayscale(0%) brightness(1); }
+        .work-title { font-family: 'Cinzel', serif; font-size: 0.9rem; color: #fff; margin-bottom: 10px; letter-spacing: 1px; }
+        .btn-small { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; padding-bottom: 3px; border-bottom: 1px solid transparent; transition: 0.3s; }
+        .work-card:hover .btn-small { color: var(--gold); border-bottom-color: var(--gold); }
+        .footer-cta { padding: 80px 20px 40px; text-align: center; background: #000; border-top: 1px solid var(--border); }
+        .social-row { display: flex; justify-content: center; align-items: center; gap: 40px; margin-bottom: 40px; }
+        .social-link { color: #555; font-size: 1.4rem; transition: all 0.4s ease; position: relative; display: flex; justify-content: center; align-items: center; width: 50px; height: 50px; border-radius: 50%; border: 1px solid transparent; }
+        .social-link:hover { color: var(--gold); border-color: rgba(197, 160, 89, 0.2); background: rgba(197, 160, 89, 0.05); transform: translateY(-5px); box-shadow: 0 0 20px rgba(197, 160, 89, 0.1); }
+        .copyright { font-size: 0.7rem; color: #333; letter-spacing: 1px; text-transform: uppercase; }
+        @media (max-width: 768px) { .hero-title { font-size: 3.8rem; } .works-grid { gap: 40px; } }
+    </style>
+</head>
+<body>
+
+    <div class="grain-overlay"></div>
+    <div id="cursor"></div>
+    <div id="cursor-follower"></div>
+
+    <canvas id="dust-canvas"></canvas>
+
+    <header>
+        <div class="author-badge fade-in-up">Pranav Gujar Presents</div>
+        <h1 class="hero-title fade-in-up" style="transition-delay: 0.2s">Loser, Am I?</h1>
+        <h2 class="hero-subtitle fade-in-up" style="transition-delay: 0.4s">Beyond Winning & Losing</h2>
+        
+        <p class="fade-in-up" style="margin-top: 40px; color: var(--gold); letter-spacing: 3px; font-size: 0.8rem; transition-delay: 0.6s">
+            Announcement : JANUARY 1, 2026
+        </p>
+    </header>
+
+    <section class="book-section">
+        <div class="book-container-3d fade-in-up" id="book-tilt">
+            <div class="book-cover"></div> 
+            <div class="book-spine"></div>
+        </div>
+
+        <div class="quote-block fade-in-up">
+            <p class="quote-text">
+                "We define ourselves by the finish line, forgetting that the race itself is a construct of the mind. To understand victory, one must first embrace the void."
+            </p>
+            <span class="quote-author">— Introduction</span>
+        </div>
+    </section>
+
+    <section class="trailer-section fade-in-up">
+        <h3 class="cinzel" style="margin-bottom: 20px; font-size: 0.9rem; color: var(--text-muted);">Official Trailer</h3>
+        
+        <div class="video-wrapper hover-trigger" id="video-wrapper">
+            <div class="video-overlay" id="video-overlay">
+                </div>
+            <iframe id="youtube-frame" 
+                    width="100%" 
+                    height="100%" 
+                    src="" 
+                    title="YouTube video player" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+            </iframe>
+        </div>
+    </section>
+
+    <section class="works-section fade-in-up">
+        <h3 class="cinzel" style="text-align: center; color: var(--text-muted); font-size: 0.9rem; letter-spacing: 4px; margin-bottom: 20px;">Previous Works</h3>
+        <div class="works-grid">
+            <a href="https://topmate.io/pranav_gujar/1440959?utm_source=public_profile&utm_campaign=pranav_gujar" class="work-card hover-trigger">
+                <img src="images/old-book1.png" alt="Book 1" class="work-img">
+                <div class="work-title">Can I Hear?</div>
+                <div class="btn-small">Explore</div>
+            </a>
+            <a href="https://topmate.io/pranav_gujar/1572044?utm_source=public_profile&utm_campaign=pranav_gujar" class="work-card hover-trigger">
+                <img src="images/old-book2.png" alt="Book 2" class="work-img">
+                <div class="work-title">Who We Are?</div>
+                <div class="btn-small">Explore</div>
+            </a>
+        </div>
+    </section>
+
+    <footer class="footer-cta fade-in-up">
+        <h3 class="cinzel" style="margin-bottom: 30px; font-size: 1.2rem;">Connect</h3>
+        <div class="social-row">
+            <a href="https://www.youtube.com/@pranavgujar_official" class="social-link hover-trigger"><i class="fab fa-youtube"></i></a>
+            <a href="https://www.instagram.com/mr.pranav_gujar_official_?igshid=MzNlNGNkZWQ4Mg%3D%3D" class="social-link hover-trigger"><i class="fab fa-instagram"></i></a>
+            <a href="https://www.facebook.com/people/Mr-Pranav-Gujar/100093342990512/?mibextid=ZbWKwL" class="social-link hover-trigger"><i class="fab fa-facebook"></i></a>
+            <a href="https://www.linkedin.com/in/pranav-gujar-54551b226/" class="social-link hover-trigger"><i class="fab fa-linkedin-in"></i></a>
+        </div>
+        <p class="copyright">&copy; 2026 Pranav Gujar. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        // --- 1. KEEP YOUR EXISTING CURSOR & PARTICLES CODE HERE ---
+        // (Paste the cursor/particle parts from the previous code here)
+        
+        // --- 1. CURSOR LOGIC ---
+        const cursor = document.getElementById('cursor');
+        const follower = document.getElementById('cursor-follower');
+        let mouseX = 0, mouseY = 0, posX = 0, posY = 0;
+        document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; cursor.style.left = mouseX + 'px'; cursor.style.top = mouseY + 'px'; });
+        function animateCursor() { posX += (mouseX - posX) / 8; posY += (mouseY - posY) / 8; follower.style.left = posX + 'px'; follower.style.top = posY + 'px'; requestAnimationFrame(animateCursor); }
+        animateCursor();
+        document.querySelectorAll('.hover-trigger, a, button, .video-overlay').forEach(el => { el.addEventListener('mouseenter', () => document.body.classList.add('hovered')); el.addEventListener('mouseleave', () => document.body.classList.remove('hovered')); });
+
+        // --- 2. PARTICLES ---
+        const canvas = document.getElementById('dust-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        const particles = [];
+        const particleCount = 50; 
+        class Particle {
+            constructor() { this.reset(); }
+            reset() { this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height; this.vx = (Math.random() - 0.5) * 0.2; this.vy = (Math.random() - 0.5) * 0.2; this.size = Math.random() * 2; this.alpha = Math.random() * 0.5; this.growing = true; }
+            update() { this.x += this.vx; this.y += this.vy; if (this.growing) { this.alpha += 0.003; if (this.alpha >= 0.6) this.growing = false; } else { this.alpha -= 0.003; if (this.alpha <= 0.1) this.growing = true; } if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) this.reset(); }
+            draw() { ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fillStyle = `rgba(197, 160, 89, ${this.alpha})`; ctx.fill(); }
+        }
+        for (let i = 0; i < particleCount; i++) particles.push(new Particle());
+        function animateParticles() { ctx.clearRect(0, 0, canvas.width, canvas.height); particles.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animateParticles); }
+        animateParticles();
+        window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+
+        // --- 3. 3D BOOK TILT ---
+        const bookContainer = document.getElementById('book-tilt');
+        const bookCover = document.querySelector('.book-cover');
+        bookContainer.addEventListener('mousemove', (e) => { const rect = bookContainer.getBoundingClientRect(); const x = e.clientX - rect.left; const y = e.clientY - rect.top; const xRotation = -10 * ((y - rect.height / 2) / rect.height); const yRotation = 10 * ((x - rect.width / 2) / rect.width); bookCover.style.transform = `rotateX(${xRotation}deg) rotateY(${yRotation}deg)`; });
+        bookContainer.addEventListener('mouseleave', () => { bookCover.style.transform = 'rotateX(0deg) rotateY(0deg)'; });
+        const observerOptions = { threshold: 0.15 };
+        const observer = new IntersectionObserver((entries) => { entries.forEach(entry => { if(entry.isIntersecting) { if(entry.target.classList.contains('fade-in-up')) { entry.target.classList.add('visible'); } } }); }, observerOptions);
+        document.querySelectorAll('.fade-in-up').forEach(el => observer.observe(el));
+
+
+        // --- 4. VIDEO PLAYER (UPDATED LOGIC) ---
+        function playVideo() {
+            const wrapper = document.getElementById('video-wrapper');
+            const frame = document.getElementById('youtube-frame');
+            
+            // If already playing, don't reload
+            if(wrapper.classList.contains('playing')) return;
+
+            wrapper.classList.add('playing');
+            
+            // CLEANEST URL PARAMETERS:
+            // autoplay=1  -> Starts automatically
+            // mute=1      -> REQUIRED for autoplay
+            // controls=1  -> Shows the time bar (user requested)
+            // loop=1      -> Replays automatically
+            // playlist=ID -> Required for loop to work
+            // modestbranding=1 -> Smaller logo
+            // rel=0       -> No random related videos
+            // color=white -> White timeline instead of red
+            
+            const videoID = "4vXNkc3lvaM";
+            
+            frame.src = `https://www.youtube.com/embed/${videoID}?autoplay=1&mute=1&controls=1&loop=1&playlist=${videoID}&modestbranding=1&rel=0&iv_load_policy=3&color=white`; 
+        }
+
+        // --- 5. DETECT WHEN VIDEO IS VISIBLE TO AUTO-PLAY ---
+        const videoObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                // If 40% of the video is visible, start playing
+                if(entry.isIntersecting) {
+                    playVideo();
+                    videoObserver.unobserve(entry.target); // Stop checking once started
+                }
+            });
+        }, { threshold: 0.4 });
+
+        const videoSection = document.getElementById('video-wrapper');
+        if(videoSection) videoObserver.observe(videoSection);
+
+    </script>
+</body>
+</html>
