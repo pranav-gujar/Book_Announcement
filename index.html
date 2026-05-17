@@ -1,727 +1,1968 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Loser, Am I? | Pranav Gujar</title>
-
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=5.0, minimum-scale=1.0, user-scalable=yes, viewport-fit=cover"
+    />
+    <title>Loser, Am I? — Beyond Winning and Losing | Pranav Gujar</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.12.313/pdf.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Inter:wght@300;400&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
-
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <link rel="icon" href="icon.png" type="image/png" />
-
+    <link rel="icon" type="image/png" href="icon.png" />
     <style>
-      /* --- KEEP ALL YOUR EXISTING CSS EXACTLY AS IS --- */
-      /* (I am hiding it here to save space, but paste your original CSS style block here) */
-
       :root {
-        --bg-color: #050505;
-        --text-primary: #e0e0e0;
-        --text-muted: #888;
-        --gold: #c5a059;
-        --gold-dim: #8a6e36;
-        --glass: rgba(255, 255, 255, 0.03);
-        --border: rgba(255, 255, 255, 0.08);
+        --ink: #0d0d0d;
+        --paper: #f5f0e8;
+        --gold: #c9a84c;
+        --gold-light: #e8c97a;
+        --gold-soft: rgba(201, 168, 76, 0.15);
+        --crimson: #8b1a1a;
+        --crimson-soft: rgba(139, 26, 26, 0.15);
+        --ash: #a89e8e;
+        --reader-bg: #1a1a1a;
+        --book-radius: 12px;
+        --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        --sidebar-width: 300px;
       }
+
       * {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
-        cursor: none;
       }
+
+      html,
       body {
-        background-color: var(--bg-color);
-        color: var(--text-primary);
-        font-family: "Inter", sans-serif;
-        overflow-x: hidden;
-        line-height: 1.8;
-      }
-      .grain-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
         height: 100%;
-        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
-        pointer-events: none;
-        z-index: 9000;
-        opacity: 0.4;
+        background: var(--ink);
+        color: var(--paper);
+        font-family: "Space Grotesk", sans-serif;
+        overflow: hidden;
+        -webkit-tap-highlight-color: transparent;
+        /* Allow text selection globally but protect canvas */
+        user-select: auto;
+        -webkit-user-select: auto;
+        /* Allow touch-action for pinch zoom */
+        touch-action: manipulation;
       }
-      #cursor {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 8px;
-        height: 8px;
-        background: var(--gold);
-        border-radius: 50%;
-        pointer-events: none;
-        z-index: 9999;
-        transform: translate(-50%, -50%);
-        box-shadow: 0 0 15px var(--gold);
-        transition: width 0.3s, height 0.3s, background 0.3s;
-        mix-blend-mode: difference;
-      }
-      #cursor-follower {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 40px;
-        height: 40px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 50%;
-        pointer-events: none;
-        transform: translate(-50%, -50%);
-        z-index: 9998;
-        transition: all 0.1s ease-out;
-      }
-      body.hovered #cursor {
-        width: 40px;
-        height: 40px;
-        opacity: 1;
-        background: #fff;
-        mix-blend-mode: normal;
-      }
-      body.hovered #cursor-follower {
-        width: 55px;
-        height: 55px;
-        border-color: var(--gold);
-        opacity: 0.6;
-      }
-      #dust-canvas {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: -1;
-        opacity: 0.5;
-      }
-      h1,
-      h2,
-      h3 {
-        font-family: "Playfair Display", serif;
-        font-weight: 400;
-      }
-      .cinzel {
-        font-family: "Cinzel", serif;
-        letter-spacing: 3px;
-      }
-      .fade-in-up {
-        opacity: 0;
-        transform: translateY(40px);
-        transition: all 1.2s cubic-bezier(0.165, 0.84, 0.44, 1);
-      }
-      .fade-in-up.visible {
-        opacity: 1;
-        transform: translateY(0);
-      }
-      header {
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
+
+      /* ───────── BUTTONS ───────── */
+      .btn-primary {
+        display: inline-flex;
         align-items: center;
-        text-align: center;
-        padding: 20px;
-        position: relative;
-      }
-      .author-badge {
-        font-size: 0.75rem;
+        gap: 12px;
+        background: linear-gradient(135deg, var(--gold) 0%, #b8943a 100%);
+        color: var(--ink);
+        font-weight: 600;
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 0.85rem;
+        letter-spacing: 0.12em;
         text-transform: uppercase;
-        letter-spacing: 6px;
-        color: var(--gold);
-        margin-bottom: 2.5rem;
-        position: relative;
-        padding-bottom: 15px;
-      }
-      .author-badge::after {
-        content: "";
-        position: absolute;
-        bottom: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 40px;
-        height: 1px;
-        background: var(--gold);
-      }
-      .hero-title {
-        font-size: clamp(3.5rem, 10vw, 7.5rem);
-        line-height: 1;
-        margin-bottom: 1.5rem;
-        background: linear-gradient(
-          to bottom,
-          #fcfcfc 0%,
-          #c5a059 60%,
-          #8a6e36 100%
-        );
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        filter: drop-shadow(0 0 40px rgba(197, 160, 89, 0.15));
-      }
-      .hero-subtitle {
-        font-size: clamp(1.1rem, 2.5vw, 1.8rem);
-        color: var(--text-muted);
-        font-style: italic;
-        font-weight: 300;
-        letter-spacing: 1px;
-      }
-      .book-section {
-        padding: 120px 5%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-      }
-      .book-container-3d {
-        width: 280px;
-        height: 420px;
-        position: relative;
-        perspective: 1500px;
-        margin: 60px 0;
-      }
-      .book-cover {
-        width: 100%;
-        height: 100%;
-        position: absolute;
-        transform-style: preserve-3d;
-        border-radius: 4px;
-        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.9);
-        background-color: #0a0a0a;
-        background-image: url("images/cover.png");
-        background-size: cover;
-        background-position: center;
+        padding: 15px 40px;
+        border: none;
+        cursor: pointer;
+        border-radius: 40px;
+        box-shadow: 0 8px 24px rgba(201, 168, 76, 0.25);
+        transition: var(--transition-smooth);
         border: 1px solid rgba(255, 255, 255, 0.1);
       }
-      .book-cover::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
+      .btn-primary:hover {
+        background: linear-gradient(135deg, var(--gold-light) 0%, #d4b05a 100%);
+        transform: translateY(-3px);
+        box-shadow: 0 16px 32px rgba(201, 168, 76, 0.35);
+      }
+
+      .action-btn {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(201, 168, 76, 0.25);
+        color: var(--gold);
+        padding: 11px 16px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        cursor: pointer;
+        border-radius: 30px;
+        transition: var(--transition-smooth);
         width: 100%;
-        height: 100%;
+        justify-content: flex-start;
+        backdrop-filter: blur(5px);
+      }
+      .action-btn i {
+        width: 18px;
+        color: var(--gold);
+        font-size: 0.95rem;
+      }
+      .action-btn:hover {
+        background: var(--gold-soft);
+        border-color: var(--gold);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(201, 168, 76, 0.15);
+      }
+
+      .tb-btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--paper);
+        padding: 8px 14px;
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 0.7rem;
+        font-weight: 500;
+        letter-spacing: 0.05em;
+        cursor: pointer;
+        border-radius: 30px;
+        transition: var(--transition-smooth);
+        white-space: nowrap;
+        backdrop-filter: blur(5px);
+      }
+      .tb-btn:hover:not(:disabled) {
+        background: rgba(201, 168, 76, 0.15);
+        border-color: var(--gold);
+        transform: translateY(-1px);
+      }
+      .tb-btn:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+
+      .goto-btn {
+        background: var(--gold-soft);
+        border: 1px solid rgba(201, 168, 76, 0.3);
+        color: var(--gold);
+        padding: 8px 14px;
+        font-size: 0.7rem;
+        font-weight: 500;
+        cursor: pointer;
+        border-radius: 30px;
+        font-family: "Space Grotesk", sans-serif;
+        transition: var(--transition-smooth);
+      }
+      .goto-btn:hover {
+        background: rgba(201, 168, 76, 0.25);
+        border-color: var(--gold);
+        transform: scale(1.02);
+      }
+
+      .menu-toggle {
+        background: var(--gold-soft);
+        border: 1px solid rgba(201, 168, 76, 0.3);
+        color: var(--gold);
+        font-size: 1.2rem;
+        padding: 8px 14px;
+        cursor: pointer;
+        border-radius: 30px;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        transition: var(--transition-smooth);
+      }
+      .menu-toggle:hover {
+        background: rgba(201, 168, 76, 0.25);
+        transform: scale(1.05);
+      }
+
+      .social-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(201, 168, 76, 0.2);
+        color: var(--ash);
+        font-size: 1.1rem;
+        border-radius: 30px;
+        transition: var(--transition-smooth);
+        text-decoration: none;
+      }
+      .social-icon:hover {
+        color: var(--gold);
+        border-color: var(--gold);
+        background: var(--gold-soft);
+        transform: translateY(-3px);
+      }
+
+      .book-apt-btn {
+        width: 100%;
         background: linear-gradient(
           135deg,
-          rgba(255, 255, 255, 0.1) 0%,
-          transparent 50%
+          rgba(139, 26, 26, 0.1) 0%,
+          rgba(139, 26, 26, 0.05) 100%
         );
-        pointer-events: none;
+        border: 1px solid rgba(139, 26, 26, 0.4);
+        color: #c03939;
+        padding: 11px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        cursor: pointer;
+        border-radius: 30px;
+        transition: var(--transition-smooth);
+        text-transform: uppercase;
+      }
+      .book-apt-btn:hover {
+        background: var(--crimson-soft);
+        border-color: var(--crimson);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(139, 26, 26, 0.2);
+      }
+
+      .btn-popup {
+        flex: 1;
+        min-width: 130px;
+        background: linear-gradient(135deg, var(--gold) 0%, #b8943a 100%);
+        color: var(--ink);
+        border: none;
+        padding: 14px 24px;
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 0.8rem;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        cursor: pointer;
+        border-radius: 40px;
+        transition: var(--transition-smooth);
+      }
+      .btn-popup:hover {
+        background: linear-gradient(135deg, var(--gold-light) 0%, #d4b05a 100%);
+        transform: translateY(-2px);
+      }
+
+      .btn-ghost {
+        padding: 14px 20px;
+        background: transparent;
+        color: var(--ash);
+        border: 1px solid rgba(168, 158, 142, 0.3);
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 0.8rem;
+        letter-spacing: 0.08em;
+        cursor: pointer;
+        border-radius: 40px;
+        transition: var(--transition-smooth);
+      }
+      .btn-ghost:hover {
+        border-color: var(--gold);
+        color: var(--gold);
+        background: var(--gold-soft);
+      }
+
+      .back-btn {
+        background: transparent;
+        border: 1px solid var(--gold);
+        color: var(--gold);
+        padding: 10px 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        cursor: pointer;
+        border-radius: 30px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: var(--transition-smooth);
+      }
+      .back-btn:hover {
+        background: var(--gold-soft);
+        transform: translateX(-2px);
+      }
+
+      /* ───────── LOADER ───────── */
+      #loader {
+        position: fixed;
+        inset: 0;
+        background: var(--ink);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        transition:
+          opacity 0.8s ease,
+          visibility 0.8s ease;
+      }
+      #loader.out {
+        opacity: 0;
+        visibility: hidden;
+      }
+      .book-icon {
+        width: 56px;
+        height: 70px;
+        position: relative;
+        margin-bottom: 28px;
+        animation: floatBook 2.5s ease-in-out infinite;
+      }
+      .book-cover {
+        position: absolute;
+        inset: 0;
+        border: 2px solid var(--gold);
+        border-radius: 2px 6px 6px 2px;
+        background: linear-gradient(
+          135deg,
+          rgba(201, 168, 76, 0.08),
+          transparent
+        );
+        animation: bookPulse 2.5s ease-in-out infinite;
       }
       .book-spine {
         position: absolute;
-        top: 0;
         left: 0;
-        width: 30px;
-        height: 100%;
-        background: #1a1a1a;
-        transform: rotateY(-90deg) translateZ(15px);
-        transform-origin: left;
-        border-left: 1px solid rgba(255, 255, 255, 0.1);
-      }
-      .quote-block {
-        max-width: 650px;
-        text-align: center;
-        margin-top: 60px;
-        padding: 40px;
-        position: relative;
-      }
-      .quote-block::before {
-        content: '"';
-        position: absolute;
         top: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        font-family: "Playfair Display", serif;
-        font-size: 6rem;
-        color: var(--glass);
-        line-height: 0.5;
+        bottom: 0;
+        width: 8px;
+        background: linear-gradient(180deg, var(--gold), var(--crimson));
+        border-radius: 2px 0 0 2px;
       }
-      .quote-text {
-        font-size: 1.35rem;
-        color: #ccc;
-        font-family: "Playfair Display", serif;
-        margin-bottom: 25px;
-        font-style: italic;
+      .book-pages {
+        display: none;
       }
-      .quote-author {
-        color: var(--gold);
-        font-size: 0.8rem;
-        letter-spacing: 3px;
+      @keyframes floatBook {
+        0%,
+        100% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+      @keyframes bookPulse {
+        0%,
+        100% {
+          box-shadow: 0 0 0 0 rgba(201, 168, 76, 0);
+        }
+        50% {
+          box-shadow: 0 0 24px 6px rgba(201, 168, 76, 0.2);
+        }
+      }
+      .loader-text {
+        font-family: "Cormorant Garamond", serif;
+        font-size: 0.95rem;
+        letter-spacing: 0.3em;
         text-transform: uppercase;
-        font-family: "Inter", sans-serif;
+        color: var(--ash);
+        margin-bottom: 20px;
+        animation: textFade 1.2s ease-in-out infinite alternate;
       }
-      .trailer-section {
-        padding: 100px 5%;
-        text-align: center;
-        border-top: 1px solid var(--border);
+      @keyframes textFade {
+        from {
+          opacity: 0.4;
+        }
+        to {
+          opacity: 1;
+        }
       }
-      .video-wrapper {
-        max-width: 900px;
-        margin: 50px auto;
+      .loader-track {
+        width: 140px;
+        height: 1px;
+        background: rgba(168, 158, 142, 0.2);
         position: relative;
-        border-radius: 2px;
         overflow: hidden;
-        box-shadow: 0 0 80px rgba(0, 0, 0, 0.9);
-        border: 1px solid var(--border);
-        aspect-ratio: 16/9;
-        background: #000;
       }
-
-      /* UPDATED OVERLAY FOR SMOOTHER TRANSITION */
-      .video-overlay {
+      .loader-fill {
         position: absolute;
+        left: -100%;
         top: 0;
-        left: 0;
         width: 100%;
         height: 100%;
-        /* Ensure this image exists in your folder! */
-        background-image: url("images/trailer.jpg");
-        background-size: cover;
-        background-position: center;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--gold),
+          transparent
+        );
+        animation: shimmer 1.5s ease infinite;
+      }
+      @keyframes shimmer {
+        to {
+          left: 100%;
+        }
+      }
+
+      /* ───────── LAUNCH SCREEN ───────── */
+      #launch {
+        position: fixed;
+        inset: 0;
+        z-index: 8000;
         display: flex;
-        justify-content: center;
         align-items: center;
-        transition: opacity 1s ease; /* Slower fade out */
-        z-index: 2;
-      }
-      .play-btn {
-        width: 70px;
-        height: 70px;
-        border: 1px solid var(--gold);
-        border-radius: 50%;
-        display: flex;
         justify-content: center;
-        align-items: center;
-        color: var(--gold);
-        font-size: 1.2rem;
-        transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        background: rgba(0, 0, 0, 0.7);
-        backdrop-filter: blur(4px);
-      }
-      .video-wrapper:hover .play-btn {
-        transform: scale(1.15);
-        background: var(--gold);
-        color: #000;
-        box-shadow: 0 0 30px var(--gold);
-      }
-      .video-wrapper.playing .video-overlay {
         opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.7s ease;
+      }
+      #launch.visible {
+        opacity: 1;
+        visibility: visible;
+      }
+      #particle-canvas {
+        position: absolute;
+        inset: 0;
         pointer-events: none;
       }
-
-      .works-section {
-        padding: 120px 5%;
-        background: linear-gradient(to top, #020202, #050505);
-        border-top: 1px solid var(--border);
-      }
-      .works-grid {
-        display: flex;
-        justify-content: center;
-        gap: 60px;
-        flex-wrap: wrap;
-        margin-top: 70px;
-      }
-      .work-card {
-        width: 260px;
-        padding: 25px;
-        background: rgba(255, 255, 255, 0.015);
-        border: 1px solid var(--border);
-        border-radius: 4px;
-        text-align: center;
-        transition: 0.5s cubic-bezier(0.2, 1, 0.3, 1);
+      .launch-frame {
         position: relative;
+        z-index: 1;
+        text-align: center;
+        padding: 60px 20px;
+        max-width: 740px;
+        width: 90%;
       }
-      .work-card:hover {
-        border-color: var(--gold-dim);
-        transform: translateY(-15px);
-        background: rgba(255, 255, 255, 0.03);
-        box-shadow: 0 30px 50px rgba(0, 0, 0, 0.8);
+      .ghost-number {
+        position: absolute;
+        top: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-family: "Cormorant Garamond", serif;
+        font-size: clamp(6rem, 18vw, 13rem);
+        font-weight: 700;
+        line-height: 1;
+        color: transparent;
+        -webkit-text-stroke: 1px rgba(201, 168, 76, 0.1);
+        pointer-events: none;
+        user-select: none;
       }
-      .work-img {
-        width: 100%;
-        border-radius: 2px;
-        margin-bottom: 25px;
-        transition: 0.5s;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
-        filter: grayscale(100%) brightness(0.8);
-      }
-      .work-card:hover .work-img {
-        filter: grayscale(0%) brightness(1);
-      }
-      .work-title {
-        font-family: "Cinzel", serif;
-        font-size: 0.9rem;
-        color: #fff;
-        margin-bottom: 10px;
-        letter-spacing: 1px;
-      }
-      .btn-small {
-        font-size: 0.7rem;
-        color: var(--text-muted);
+      .launch-stamp {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid rgba(201, 168, 76, 0.4);
+        color: var(--gold);
+        font-size: 0.62rem;
+        letter-spacing: 0.35em;
         text-transform: uppercase;
-        letter-spacing: 2px;
-        padding-bottom: 3px;
-        border-bottom: 1px solid transparent;
-        transition: 0.3s;
+        padding: 7px 20px;
+        margin-bottom: 36px;
+        opacity: 0;
+        animation: riseIn 0.6s 0.1s ease forwards;
+        border-radius: 30px;
       }
-      .work-card:hover .btn-small {
-        color: var(--gold);
-        border-bottom-color: var(--gold);
-      }
-      .footer-cta {
-        padding: 80px 20px 40px;
-        text-align: center;
-        background: #000;
-        border-top: 1px solid var(--border);
-      }
-      .social-row {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 40px;
-        margin-bottom: 40px;
-      }
-      .social-link {
-        color: #555;
-        font-size: 1.4rem;
-        transition: all 0.4s ease;
-        position: relative;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 50px;
-        height: 50px;
+      .stamp-dot {
+        width: 5px;
+        height: 5px;
         border-radius: 50%;
-        border: 1px solid transparent;
+        background: var(--gold);
       }
-      .social-link:hover {
+      .launch-eyebrow {
+        font-size: 0.7rem;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: var(--ash);
+        margin-bottom: 18px;
+        opacity: 0;
+        animation: riseIn 0.6s 0.25s ease forwards;
+      }
+      .launch-title {
+        font-family: "Cormorant Garamond", serif;
+        font-size: clamp(3.4rem, 9vw, 6.5rem);
+        font-weight: 600;
+        line-height: 0.95;
+        color: var(--paper);
+        margin-bottom: 14px;
+        opacity: 0;
+        animation: riseIn 0.7s 0.4s ease forwards;
+      }
+      .launch-title .italic {
+        font-style: italic;
         color: var(--gold);
-        border-color: rgba(197, 160, 89, 0.2);
-        background: rgba(197, 160, 89, 0.05);
-        transform: translateY(-5px);
-        box-shadow: 0 0 20px rgba(197, 160, 89, 0.1);
+      }
+      .launch-sub {
+        font-family: "Cormorant Garamond", serif;
+        font-style: italic;
+        font-size: clamp(1rem, 2.5vw, 1.45rem);
+        color: var(--ash);
+        margin-bottom: 36px;
+        opacity: 0;
+        animation: riseIn 0.6s 0.55s ease forwards;
+      }
+      .launch-rule {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        justify-content: center;
+        margin-bottom: 32px;
+        opacity: 0;
+        animation: riseIn 0.5s 0.7s ease forwards;
+      }
+      .rule-line {
+        flex: 0 0 60px;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--gold));
+      }
+      .rule-line.rev {
+        background: linear-gradient(270deg, transparent, var(--gold));
+      }
+      .rule-diamond {
+        width: 6px;
+        height: 6px;
+        border: 1px solid var(--gold);
+        transform: rotate(45deg);
+      }
+      .launch-quote {
+        font-family: "Cormorant Garamond", serif;
+        font-size: clamp(1.05rem, 2.6vw, 1.35rem);
+        font-style: italic;
+        line-height: 1.7;
+        color: var(--paper);
+        max-width: 540px;
+        margin: 0 auto 12px;
+        opacity: 0;
+        animation: riseIn 0.6s 0.85s ease forwards;
+      }
+      .launch-attr {
+        font-size: 0.72rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--gold);
+        margin-bottom: 44px;
+        opacity: 0;
+        animation: riseIn 0.5s 1s ease forwards;
+      }
+      .launch-cta {
+        opacity: 0;
+        animation: riseIn 0.6s 1.15s ease forwards;
+      }
+      @keyframes riseIn {
+        from {
+          opacity: 0;
+          transform: translateY(18px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* ───────── POP-UP ───────── */
+      #popup {
+        position: fixed;
+        inset: 0;
+        z-index: 9500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.45s ease;
+      }
+      #popup.open {
+        opacity: 1;
+        visibility: visible;
+      }
+      .popup-bg {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(12px);
+        cursor: pointer;
+      }
+      .popup-card {
+        position: relative;
+        z-index: 1;
+        width: min(540px, 88vw);
+        background: linear-gradient(135deg, #151515 0%, #0f0f0f 100%);
+        border: 1px solid rgba(201, 168, 76, 0.3);
+        transform: translateY(24px) scale(0.96);
+        transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+        overflow: hidden;
+        border-radius: 24px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      }
+      #popup.open .popup-card {
+        transform: translateY(0) scale(1);
+      }
+      .popup-stripe {
+        height: 3px;
+        background: linear-gradient(
+          90deg,
+          var(--crimson) 0%,
+          var(--gold) 50%,
+          var(--crimson) 100%
+        );
+      }
+      .popup-body {
+        padding: 44px 30px 36px;
+        position: relative;
+      }
+      .popup-ghost {
+        position: absolute;
+        right: -10px;
+        top: -20px;
+        font-family: "Cormorant Garamond", serif;
+        font-size: 9rem;
+        font-weight: 700;
+        line-height: 1;
+        color: transparent;
+        -webkit-text-stroke: 1px rgba(201, 168, 76, 0.08);
+        user-select: none;
+        pointer-events: none;
+      }
+      .popup-tag {
+        font-size: 0.6rem;
+        letter-spacing: 0.4em;
+        text-transform: uppercase;
+        color: var(--gold);
+        margin-bottom: 14px;
+      }
+      .popup-title {
+        font-family: "Cormorant Garamond", serif;
+        font-size: 2.1rem;
+        font-weight: 600;
+        line-height: 1.15;
+        color: var(--paper);
+        margin-bottom: 6px;
+      }
+      .popup-title span {
+        color: var(--gold);
+        font-style: italic;
+      }
+      .popup-subtitle {
+        font-family: "Cormorant Garamond", serif;
+        font-style: italic;
+        font-size: 1rem;
+        color: var(--ash);
+        margin-bottom: 24px;
+      }
+      .popup-note {
+        border-left: 2px solid var(--gold);
+        padding: 12px 16px;
+        margin-bottom: 28px;
+        background: var(--gold-soft);
+        border-radius: 8px;
+      }
+      .popup-note strong {
+        display: block;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--paper);
+        letter-spacing: 0.05em;
+        margin-bottom: 6px;
+      }
+      .popup-note p {
+        font-size: 0.9rem;
+        line-height: 1.7;
+        color: var(--ash);
+      }
+      .popup-note em {
+        font-style: italic;
+        color: var(--paper);
+      }
+      .popup-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      /* ───────── MAIN APP ───────── */
+      #app {
+        height: 100vh;
+        display: none;
+        flex-direction: column;
+        background: #111;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+      }
+      #app.show {
+        display: flex;
+      }
+      #app.fade {
+        opacity: 1;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 20px;
+        height: 56px;
+        min-height: 56px;
+        background: rgba(13, 13, 13, 0.95);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(201, 168, 76, 0.1);
+        flex-shrink: 0;
+      }
+      .topbar-left {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .topbar-logo {
+        font-family: "Cormorant Garamond", serif;
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--paper);
+      }
+      .topbar-logo em {
+        font-style: italic;
+        color: var(--gold);
+      }
+      .topbar-sep {
+        width: 1px;
+        height: 18px;
+        background: rgba(255, 255, 255, 0.1);
+      }
+      .topbar-author {
+        font-size: 0.7rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--ash);
+      }
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .topbar-badge {
+        font-size: 0.58rem;
+        letter-spacing: 0.25em;
+        text-transform: uppercase;
+        color: var(--gold);
+        border: 1px solid rgba(201, 168, 76, 0.35);
+        padding: 6px 12px;
+        border-radius: 30px;
+        background: var(--gold-soft);
+      }
+
+      .body-layout {
+        display: flex;
+        flex: 1;
+        overflow: hidden;
+        min-height: 0;
+      }
+
+      /* SIDEBAR */
+      .sidebar {
+        width: var(--sidebar-width);
+        min-width: var(--sidebar-width);
+        background: rgba(13, 13, 13, 0.98);
+        backdrop-filter: blur(10px);
+        border-right: 1px solid rgba(201, 168, 76, 0.1);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+      .sidebar-content {
+        padding: 14px 0;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        gap: 4px;
+      }
+      .sb-book {
+        padding: 10px 18px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      .sb-label {
+        font-size: 0.55rem;
+        letter-spacing: 0.25em;
+        text-transform: uppercase;
+        color: rgba(168, 158, 142, 0.6);
+        margin-bottom: 5px;
+      }
+      .sb-title {
+        font-family: "Cormorant Garamond", serif;
+        font-size: 1.15rem;
+        font-weight: 600;
+        line-height: 1.2;
+        color: var(--paper);
+      }
+      .sb-title em {
+        font-style: italic;
+        color: var(--gold);
+      }
+      .sb-sub {
+        font-family: "Cormorant Garamond", serif;
+        font-style: italic;
+        font-size: 0.8rem;
+        color: var(--ash);
+        margin-top: 2px;
+      }
+      .sb-author {
+        font-size: 0.65rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--ash);
+        margin-top: 6px;
+      }
+
+      .sb-goto {
+        padding: 10px 18px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      .goto-label {
+        font-size: 0.55rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--ash);
+        margin-bottom: 8px;
+      }
+      .goto-row {
+        display: flex;
+        gap: 8px;
+      }
+      .goto-input {
+        flex: 1;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(201, 168, 76, 0.2);
+        color: var(--paper);
+        padding: 8px 12px;
+        font-size: 0.8rem;
+        border-radius: 30px;
+        font-family: "Space Grotesk", sans-serif;
+        outline: none;
+        transition: var(--transition-smooth);
+      }
+      .goto-input:focus {
+        border-color: var(--gold);
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .progress-wrap {
+        padding: 10px 18px 0;
+      }
+      .progress-track {
+        height: 2px;
+        background: rgba(255, 255, 255, 0.07);
+        border-radius: 2px;
+        overflow: hidden;
+      }
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--gold), var(--gold-light));
+        width: 0%;
+        transition: width 0.35s ease;
+        border-radius: 2px;
+      }
+
+      .sb-stats {
+        padding: 8px 18px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      .stat-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 5px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      }
+      .stat-row:last-child {
+        border-bottom: none;
+      }
+      .stat-key {
+        font-size: 0.65rem;
+        color: var(--ash);
+      }
+      .stat-val {
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: var(--paper);
+      }
+      .stat-val.g {
+        color: var(--gold);
+      }
+
+      .sidebar-actions {
+        padding: 8px 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      .social-section {
+        padding: 8px 18px;
+      }
+      .social-title {
+        font-size: 0.55rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--ash);
+        margin-bottom: 10px;
+      }
+      .social-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+
+      .sidebar-footer {
+        padding: 6px 18px;
+        margin-top: auto;
+      }
+
+      /* READER */
+      .reader {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        min-width: 0;
+        background: var(--reader-bg);
+      }
+
+      /* Book Controls - now part of canvas area */
+      .book-controls {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 8px 10px;
+        margin: 8px 12px 4px;
+        background: rgba(13, 13, 13, 0.7);
+        backdrop-filter: blur(8px);
+        border-radius: 50px;
+        border: 1px solid rgba(201, 168, 76, 0.15);
+        flex-shrink: 0;
+        flex-wrap: wrap;
+      }
+
+      .page-input-pill {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 8px 4px 12px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 40px;
+      }
+      .page-input-pill span {
+        font-size: 0.7rem;
+        color: var(--ash);
+      }
+      .page-input-pill input {
+        width: 50px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(201, 168, 76, 0.2);
+        color: var(--paper);
+        padding: 4px 6px;
+        font-size: 0.7rem;
+        border-radius: 20px;
+        font-family: "Space Grotesk", sans-serif;
+        outline: none;
+        text-align: center;
+      }
+      .page-input-pill input:focus {
+        border-color: var(--gold);
+      }
+      .page-input-pill strong {
+        color: var(--paper);
+        font-weight: 600;
+        margin: 0 2px;
+      }
+
+      .canvas-area {
+        flex: 1;
+        overflow: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 12px 12px;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(201, 168, 76, 0.25) transparent;
+        -webkit-overflow-scrolling: touch;
+        /* Allow pinch zoom on mobile */
+        touch-action: pan-x pan-y pinch-zoom;
+      }
+      .canvas-area::-webkit-scrollbar {
+        width: 5px;
+      }
+      .canvas-area::-webkit-scrollbar-thumb {
+        background: rgba(201, 168, 76, 0.3);
+        border-radius: 3px;
+      }
+
+      #pdf-canvas {
+        display: none;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+        border-radius: var(--book-radius);
+        max-width: 100%;
+        max-height: 100%;
+        width: auto !important;
+        height: auto !important;
+        background: white;
+        border: 1px solid rgba(201, 168, 76, 0.2);
+        image-rendering: crisp-edges;
+        image-rendering: -webkit-optimize-contrast;
+        /* Protect canvas from right-click but allow pinch zoom */
+        pointer-events: none;
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-touch-callout: none;
+      }
+
+      .swipe-hint {
+        font-size: 0.65rem;
+        color: var(--ash);
+        margin-top: 8px;
+        opacity: 0.6;
+        text-align: center;
+        letter-spacing: 0.15em;
+        padding: 6px 16px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 30px;
+        display: inline-block;
+        border: 1px solid rgba(201, 168, 76, 0.15);
+      }
+
+      .state-msg {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 18px;
+        height: 100%;
+        text-align: center;
+        padding: 40px 20px;
+      }
+      .spin {
+        width: 32px;
+        height: 32px;
+        border: 2px solid rgba(201, 168, 76, 0.12);
+        border-top-color: var(--gold);
+        border-radius: 50%;
+        animation: spin 0.85s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .state-msg p {
+        font-size: 0.78rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--ash);
+      }
+      .state-msg h3 {
+        font-family: "Cormorant Garamond", serif;
+        font-size: 1.5rem;
+        color: var(--paper);
+      }
+      .state-msg small {
+        font-size: 0.9rem;
+        color: var(--ash);
+        line-height: 1.6;
+        max-width: 380px;
+      }
+
+      .footbar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 20px;
+        min-height: 36px;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(10px);
+        border-top: 1px solid rgba(201, 168, 76, 0.1);
+        flex-shrink: 0;
+        gap: 20px;
       }
       .copyright {
-        font-size: 0.7rem;
-        color: #333;
-        letter-spacing: 1px;
-        text-transform: uppercase;
+        font-size: 0.65rem;
+        color: rgba(168, 158, 142, 0.6);
+        letter-spacing: 0.08em;
       }
-      @media (max-width: 768px) {
-        .hero-title {
-          font-size: 3.8rem;
+
+      /* Mobile menu */
+      .mobile-menu {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 280px;
+        background: linear-gradient(135deg, #131313 0%, #0a0a0a 100%);
+        backdrop-filter: blur(20px);
+        z-index: 9100;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        box-shadow: 4px 0 30px rgba(0, 0, 0, 0.6);
+        overflow-y: auto;
+        border-right: 1px solid rgba(201, 168, 76, 0.15);
+        padding: 20px 0;
+      }
+      .mobile-menu.open {
+        transform: translateX(0);
+      }
+      .menu-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(5px);
+        z-index: 9000;
+        opacity: 0;
+        visibility: hidden;
+        transition: 0.2s;
+      }
+      .menu-overlay.show {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .mobile-menu-close {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        background: rgba(201, 168, 76, 0.15);
+        border: 1px solid rgba(201, 168, 76, 0.3);
+        color: var(--gold);
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: var(--transition-smooth);
+        font-size: 1.1rem;
+      }
+
+      /* Feedback page */
+      .feedback-page {
+        position: fixed;
+        inset: 0;
+        background: linear-gradient(135deg, #0f0f0f 0%, #080808 100%);
+        z-index: 9800;
+        display: none;
+        flex-direction: column;
+      }
+      .feedback-header {
+        padding: 16px 24px;
+        border-bottom: 1px solid rgba(201, 168, 76, 0.15);
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        background: rgba(13, 13, 13, 0.95);
+        backdrop-filter: blur(10px);
+      }
+      .feedback-header span {
+        color: var(--gold);
+        font-size: 1.2rem;
+        font-family: "Cormorant Garamond", serif;
+        font-style: italic;
+        font-weight: 600;
+      }
+      .feedback-content {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        overflow: auto;
+      }
+      .feedback-iframe {
+        width: 100%;
+        max-width: 700px;
+        height: 100%;
+        max-height: 800px;
+        border: none;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(201, 168, 76, 0.2);
+      }
+      .feedback-footer {
+        padding: 12px 24px;
+        border-top: 1px solid rgba(201, 168, 76, 0.15);
+        text-align: center;
+        background: rgba(13, 13, 13, 0.95);
+      }
+
+      /* Responsive */
+      .sharpen-text {
+        display: inline;
+      }
+      .desktop-only {
+        display: inline;
+      }
+      .mobile-only {
+        display: none;
+      }
+
+      @media (max-width: 700px) {
+        :root {
+          --sidebar-width: 280px;
         }
-        .works-grid {
-          gap: 40px;
+        .sidebar {
+          display: none;
         }
+        .menu-toggle {
+          display: flex;
+        }
+        .topbar-author,
+        .topbar-sep,
+        .topbar-badge {
+          display: none;
+        }
+        .desktop-only {
+          display: none;
+        }
+        .mobile-only {
+          display: inline;
+        }
+        .book-controls {
+          margin: 4px 8px;
+          padding: 6px 8px;
+        }
+        .tb-btn {
+          padding: 6px 10px;
+          font-size: 0.65rem;
+        }
+        .canvas-area {
+          padding: 4px 8px 8px;
+        }
+        .footbar {
+          justify-content: center;
+        }
+        .footbar .dots-row,
+        #foot-right {
+          display: none;
+        }
+        .copyright {
+          text-align: center;
+          font-size: 0.6rem;
+        }
+        .sharpen-text {
+          display: none;
+        }
+        .page-input-pill span {
+          display: none;
+        }
+        .page-input-pill input {
+          width: 45px;
+        }
+      }
+
+      @media (min-width: 701px) {
+        .copyright {
+          margin-left: auto;
+        }
+        .swipe-hint {
+          display: none;
+        }
+        .mobile-menu-close {
+          display: none;
+        }
+      }
+
+      @media (max-width: 380px) {
+        .book-controls {
+          padding: 4px 6px;
+          gap: 4px;
+        }
+        .tb-btn {
+          padding: 5px 8px;
+          font-size: 0.6rem;
+        }
+      }
+
+      /* Only protect canvas, not the whole page */
+      #pdf-canvas {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        pointer-events: none;
       }
     </style>
   </head>
   <body>
-    <div class="grain-overlay"></div>
-    <div id="cursor"></div>
-    <div id="cursor-follower"></div>
-
-    <canvas id="dust-canvas"></canvas>
-
-    <header>
-      <div class="author-badge fade-in-up">Pranav Gujar Presents</div>
-      <h1 class="hero-title fade-in-up" style="transition-delay: 0.2s">
-        Loser, Am I?
-      </h1>
-      <h2 class="hero-subtitle fade-in-up" style="transition-delay: 0.4s">
-        Beyond Winning & Losing
-      </h2>
-
-      <p
-        class="fade-in-up"
-        style="
-          margin-top: 40px;
-          color: var(--gold);
-          letter-spacing: 3px;
-          font-size: 0.8rem;
-          transition-delay: 0.6s;
-        "
-      >
-        Announcement : JANUARY 1, 2026
-      </p>
-    </header>
-
-    <section class="book-section">
-      <div class="book-container-3d fade-in-up" id="book-tilt">
-        <div class="book-cover"></div>
+    <!-- LOADER -->
+    <div id="loader">
+      <div class="book-icon">
         <div class="book-spine"></div>
+        <div class="book-cover"></div>
+        <div class="book-pages"></div>
       </div>
+      <div class="loader-text">THE STORY AWAITS</div>
+      <div class="loader-track"><div class="loader-fill"></div></div>
+    </div>
 
-      <div class="quote-block fade-in-up">
-        <p class="quote-text">
-          "We define ourselves by the finish line, forgetting that the race
-          itself is a construct of the mind. To understand victory, one must
-          first embrace the void."
-        </p>
-        <span class="quote-author">— Introduction</span>
+    <!-- LAUNCH -->
+    <div id="launch">
+      <canvas id="particle-canvas"></canvas>
+      <div class="launch-frame">
+        <div class="ghost-number">III</div>
+        <div class="launch-stamp">
+          <span class="stamp-dot"></span>Official Launch — 17 May 2026<span
+            class="stamp-dot"
+          ></span>
+        </div>
+        <div class="launch-eyebrow">Book No. 3 · Pranav Gujar</div>
+        <div class="launch-title"><span class="italic">Loser,</span> Am I?</div>
+        <div class="launch-sub">Beyond Winning and Losing</div>
+        <div class="launch-rule">
+          <div class="rule-line"></div>
+          <div class="rule-diamond"></div>
+          <div class="rule-line rev"></div>
+        </div>
+        <div class="launch-quote">
+          "The world handed us two boxes —<br />one labeled <em>Winner</em>, one
+          <em>Loser</em>.<br />This book refuses to climb inside either."
+        </div>
+        <div class="launch-attr">— Pranav Gujar</div>
+        <div class="launch-cta">
+          <button class="btn-primary" onclick="openReader()">
+            Begin Reading<svg width="16" height="16" viewBox="0 0 15 15">
+              <path
+                d="M2 7.5h11M8 3l4.5 4.5L8 12"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
       </div>
-    </section>
+    </div>
 
-    <section class="trailer-section fade-in-up">
-      <h3
-        class="cinzel"
-        style="margin-bottom: 20px; font-size: 0.9rem; color: var(--text-muted)"
-      >
-        Official Trailer
-      </h3>
+    <!-- POPUP -->
+    <div id="popup">
+      <div class="popup-bg" onclick="closePopup()"></div>
+      <div class="popup-card">
+        <div class="popup-stripe"></div>
+        <div class="popup-body">
+          <div class="popup-ghost">3</div>
+          <div class="popup-tag">A Note Before You Begin</div>
+          <div class="popup-title">
+            You've carried this<br /><span>label long enough.</span>
+          </div>
+          <div class="popup-subtitle">Beyond Winning and Losing</div>
+          <div class="popup-note">
+            <strong>What awaits inside</strong>
+            <p>
+              This is not a book that tells you how to win.<br />It's an
+              invitation to question the scoreboard entirely — to explore what
+              life looks like when you stop measuring it in victories and
+              defeats, and start measuring it in <em>depth</em>.
+            </p>
+          </div>
+          <div class="popup-actions">
+            <button class="btn-popup" onclick="closePopup()">
+              Start Reading Now
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-      <div class="video-wrapper hover-trigger" id="video-wrapper">
-        <div class="video-overlay" id="video-overlay"></div>
+    <!-- MOBILE MENU -->
+    <div
+      class="menu-overlay"
+      id="menuOverlay"
+      onclick="closeMobileMenu()"
+    ></div>
+    <div class="mobile-menu" id="mobileMenu">
+      <div class="mobile-menu-close" onclick="closeMobileMenu()">
+        <i class="fas fa-times"></i>
+      </div>
+      <div style="padding: 0 18px 16px">
+        <div class="sb-label">Now Reading</div>
+        <div class="sb-title"><em>Loser,</em> Am I?</div>
+        <div class="sb-sub">Beyond Winning and Losing</div>
+      </div>
+      <div class="sb-stats" id="mobileStats"></div>
+      <div class="sidebar-actions">
+        <button class="action-btn" onclick="sharePage()">
+          <i class="fas fa-share-alt"></i> Share
+        </button>
+        <button class="action-btn" onclick="openFeedback()">
+          <i class="fas fa-comment"></i> Feedback
+        </button>
+      </div>
+      <div class="social-section">
+        <div class="social-title">Connect with Pranav Gujar</div>
+        <div class="social-grid">
+          <a
+            href="https://www.instagram.com/mr.pranav_gujar_official_?igshid=MzNlNGNkZWQ4Mg%3D%3D"
+            class="social-icon"
+            target="_blank"
+            ><i class="fab fa-instagram"></i
+          ></a>
+          <a
+            href="https://www.linkedin.com/in/pranav-gujar-54551b226/"
+            class="social-icon"
+            target="_blank"
+            ><i class="fab fa-linkedin-in"></i
+          ></a>
+          <a
+            href="https://youtube.com/@pranavgujar_official?si=p8RgWn_cb8O_XtB8"
+            class="social-icon"
+            target="_blank"
+            ><i class="fab fa-youtube"></i
+          ></a>
+          <a
+            href="https://founder.pgtglobalnetwork.com/"
+            class="social-icon"
+            target="_blank"
+            ><i class="fas fa-globe"></i
+          ></a>
+        </div>
+        <button
+          class="book-apt-btn"
+          onclick="window.open('https://topmate.io/pranav_gujar', '_blank')"
+        >
+          Book Appointment
+        </button>
+      </div>
+      <div style="padding: 16px">
+        <div class="copyright">© 2026 Loser, Am I? · Pranav Gujar</div>
+      </div>
+    </div>
+
+    <!-- FEEDBACK PAGE -->
+    <div class="feedback-page" id="feedbackPage">
+      <div class="feedback-header">
+        <button class="back-btn" onclick="closeFeedback()">
+          <i class="fas fa-arrow-left"></i> Back to Book
+        </button>
+        <span>Reader Feedback</span>
+      </div>
+      <div class="feedback-content">
         <iframe
-          id="youtube-frame"
-          width="100%"
-          height="100%"
-          src=""
-          title="YouTube video player"
-          frameborder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen
-        >
-        </iframe>
+          class="feedback-iframe"
+          id="feedbackFrame"
+          title="Feedback Form"
+        ></iframe>
       </div>
-    </section>
+      <div class="feedback-footer">
+        <div class="copyright">© 2026 Loser, Am I? · Pranav Gujar</div>
+      </div>
+    </div>
 
-    <section class="works-section fade-in-up">
-      <h3
-        class="cinzel"
-        style="
-          text-align: center;
-          color: var(--text-muted);
-          font-size: 0.9rem;
-          letter-spacing: 4px;
-          margin-bottom: 20px;
-        "
-      >
-        Previous Works
-      </h3>
-      <div class="works-grid">
-        <a
-          href="https://topmate.io/pranav_gujar/1440959?utm_source=public_profile&utm_campaign=pranav_gujar"
-          class="work-card hover-trigger"
-        >
-          <img src="images/old-book1.png" alt="Book 1" class="work-img" />
-          <div class="work-title">Can I Hear?</div>
-          <div class="btn-small">Explore</div>
-        </a>
-        <a
-          href="https://topmate.io/pranav_gujar/1572044?utm_source=public_profile&utm_campaign=pranav_gujar"
-          class="work-card hover-trigger"
-        >
-          <img src="images/old-book2.png" alt="Book 2" class="work-img" />
-          <div class="work-title">Who Are We?</div>
-          <div class="btn-small">Explore</div>
-        </a>
+    <!-- MAIN APP -->
+    <div id="app">
+      <div class="topbar">
+        <div class="topbar-left">
+          <div class="topbar-logo"><em>Loser,</em> Am I?</div>
+          <div class="topbar-sep"></div>
+          <div class="topbar-author">Pranav Gujar</div>
+        </div>
+        <div class="topbar-right">
+          <div class="topbar-badge">Published · 17 May 2026</div>
+          <button
+            class="menu-toggle"
+            id="menuToggle"
+            onclick="toggleMobileMenu()"
+          >
+            <i class="fas fa-bars"></i>
+          </button>
+        </div>
       </div>
-    </section>
 
-    <footer class="footer-cta fade-in-up">
-      <h3 class="cinzel" style="margin-bottom: 30px; font-size: 1.2rem">
-        Connect
-      </h3>
-      <div class="social-row">
-        <a
-          href="https://www.youtube.com/@pranavgujar_official"
-          class="social-link hover-trigger"
-          ><i class="fab fa-youtube"></i
-        ></a>
-        <a
-          href="https://www.instagram.com/mr.pranav_gujar_official_?igshid=MzNlNGNkZWQ4Mg%3D%3D"
-          class="social-link hover-trigger"
-          ><i class="fab fa-instagram"></i
-        ></a>
-        <a
-          href="https://www.facebook.com/people/Mr-Pranav-Gujar/100093342990512/?mibextid=ZbWKwL"
-          class="social-link hover-trigger"
-          ><i class="fab fa-facebook"></i
-        ></a>
-        <a
-          href="https://www.linkedin.com/in/pranav-gujar-54551b226/"
-          class="social-link hover-trigger"
-          ><i class="fab fa-linkedin-in"></i
-        ></a>
+      <div class="body-layout">
+        <!-- DESKTOP SIDEBAR -->
+        <div class="sidebar">
+          <div class="sidebar-content">
+            <div class="sb-book">
+              <div class="sb-label">Now Reading</div>
+              <div class="sb-title"><em>Loser,</em> Am I?</div>
+              <div class="sb-sub">Beyond Winning and Losing</div>
+              <div class="sb-author">Pranav Gujar</div>
+            </div>
+            <div class="sb-goto">
+              <div class="goto-label">Go to page</div>
+              <div class="goto-row">
+                <input
+                  class="goto-input"
+                  id="goto-input"
+                  type="number"
+                  min="1"
+                  value="1"
+                /><button class="goto-btn" onclick="gotoPage()">Go</button>
+              </div>
+            </div>
+            <div class="progress-wrap">
+              <div class="progress-track">
+                <div class="progress-fill" id="prog"></div>
+              </div>
+            </div>
+            <div class="sb-stats">
+              <div class="stat-row">
+                <span class="stat-key">Current Page</span
+                ><span class="stat-val g" id="s-cur">—</span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-key">Total Pages</span
+                ><span class="stat-val" id="s-tot">—</span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-key">Remaining</span
+                ><span class="stat-val" id="s-rem">—</span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-key">Progress</span
+                ><span class="stat-val g" id="s-pct">0%</span>
+              </div>
+            </div>
+            <div class="sidebar-actions">
+              <button class="action-btn" onclick="sharePage()">
+                <i class="fas fa-share-alt"></i> Share
+              </button>
+              <button class="action-btn" onclick="openFeedback()">
+                <i class="fas fa-comment"></i> Feedback
+              </button>
+            </div>
+            <div class="social-section">
+              <div class="social-title">Connect with Pranav</div>
+              <div class="social-grid">
+                <a
+                  href="https://www.instagram.com/mr.pranav_gujar_official_?igshid=MzNlNGNkZWQ4Mg%3D%3D"
+                  class="social-icon"
+                  target="_blank"
+                  ><i class="fab fa-instagram"></i
+                ></a>
+                <a
+                  href="https://www.linkedin.com/in/pranav-gujar-54551b226/"
+                  class="social-icon"
+                  target="_blank"
+                  ><i class="fab fa-linkedin-in"></i
+                ></a>
+                <a
+                  href="https://youtube.com/@pranavgujar_official?si=p8RgWn_cb8O_XtB8"
+                  class="social-icon"
+                  target="_blank"
+                  ><i class="fab fa-youtube"></i
+                ></a>
+                <a
+                  href="https://founder.pgtglobalnetwork.com/"
+                  class="social-icon"
+                  target="_blank"
+                  ><i class="fas fa-globe"></i
+                ></a>
+              </div>
+              <button
+                class="book-apt-btn"
+                onclick="
+                  window.open('https://topmate.io/pranav_gujar', '_blank')
+                "
+              >
+                Book Appointment
+              </button>
+            </div>
+            <div class="sidebar-footer">
+              <div class="copyright">© 2026 Loser, Am I? · Pranav Gujar</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="reader">
+          <!-- Book controls -->
+          <div class="book-controls">
+            <button
+              class="tb-btn"
+              id="btn-prev"
+              onclick="changePage(-1)"
+              disabled
+            >
+              <i class="fas fa-chevron-left"></i> Prev
+            </button>
+            <button class="tb-btn" id="btn-zoom-out" onclick="sharpenText(-1)">
+              <i class="fas fa-minus"></i
+              ><span class="sharpen-text"> Sharpen</span>
+            </button>
+
+            <div class="page-input-pill">
+              <span>Page</span>
+              <input type="number" id="mobile-page-input" min="1" value="1" />
+              <strong>/</strong>
+              <strong id="mobile-page-total">—</strong>
+            </div>
+
+            <button class="tb-btn" id="btn-zoom-in" onclick="sharpenText(1)">
+              <i class="fas fa-plus"></i
+              ><span class="sharpen-text"> Sharpen</span>
+            </button>
+            <button
+              class="tb-btn"
+              id="btn-next"
+              onclick="changePage(1)"
+              disabled
+            >
+              Next <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+
+          <div
+            class="canvas-area"
+            id="canvas-area"
+            oncontextmenu="return false;"
+          >
+            <div class="state-msg" id="state-loading">
+              <div class="spin"></div>
+              <p>Loading Book…</p>
+            </div>
+            <canvas id="pdf-canvas" oncontextmenu="return false;"></canvas>
+            <div class="state-msg" id="state-error" style="display: none">
+              <h3>Book Not Found</h3>
+              <small>Place <strong>book.pdf</strong> in the same folder.</small>
+            </div>
+            <div class="swipe-hint" id="swipe-hint">
+              ← Swipe to turn pages →
+            </div>
+          </div>
+
+          <div class="footbar">
+            <div class="copyright">© 2026 Loser, Am I? · Pranav Gujar</div>
+            <div class="dots-row" id="dots"></div>
+            <div
+              id="foot-right"
+              style="font-size: 0.65rem; color: rgba(168, 158, 142, 0.5)"
+            ></div>
+          </div>
+        </div>
       </div>
-      <p class="copyright">&copy; 2026 Pranav Gujar. All Rights Reserved.</p>
-    </footer>
+    </div>
 
     <script>
-      // --- 1. KEEP YOUR EXISTING CURSOR & PARTICLES CODE HERE ---
-      // (Paste the cursor/particle parts from the previous code here)
+      (function () {
+        pdfjsLib.GlobalWorkerOptions.workerSrc =
+          "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.12.313/pdf.worker.min.js";
 
-      // --- 1. CURSOR LOGIC ---
-      const cursor = document.getElementById("cursor");
-      const follower = document.getElementById("cursor-follower");
-      let mouseX = 0,
-        mouseY = 0,
-        posX = 0,
-        posY = 0;
-      document.addEventListener("mousemove", (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-        cursor.style.left = mouseX + "px";
-        cursor.style.top = mouseY + "px";
-      });
-      function animateCursor() {
-        posX += (mouseX - posX) / 8;
-        posY += (mouseY - posY) / 8;
-        follower.style.left = posX + "px";
-        follower.style.top = posY + "px";
-        requestAnimationFrame(animateCursor);
-      }
-      animateCursor();
-      document
-        .querySelectorAll(".hover-trigger, a, button, .video-overlay")
-        .forEach((el) => {
-          el.addEventListener("mouseenter", () =>
-            document.body.classList.add("hovered")
-          );
-          el.addEventListener("mouseleave", () =>
-            document.body.classList.remove("hovered")
-          );
+        let pdfDoc = null,
+          pageNum = 1,
+          totalPages = 0;
+        let pageRendering = false,
+          pageNumPending = null;
+        let renderQuality = 2.0;
+        const canvas = document.getElementById("pdf-canvas");
+        const ctx = canvas.getContext("2d");
+
+        canvas.addEventListener("contextmenu", (e) => e.preventDefault());
+        document.addEventListener("contextmenu", (e) => {
+          if (e.target === canvas || canvas.contains(e.target))
+            e.preventDefault();
         });
 
-      // --- 2. PARTICLES ---
-      const canvas = document.getElementById("dust-canvas");
-      const ctx = canvas.getContext("2d");
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      const particles = [];
-      const particleCount = 50;
-      class Particle {
-        constructor() {
-          this.reset();
-        }
-        reset() {
-          this.x = Math.random() * canvas.width;
-          this.y = Math.random() * canvas.height;
-          this.vx = (Math.random() - 0.5) * 0.2;
-          this.vy = (Math.random() - 0.5) * 0.2;
-          this.size = Math.random() * 2;
-          this.alpha = Math.random() * 0.5;
-          this.growing = true;
-        }
-        update() {
-          this.x += this.vx;
-          this.y += this.vy;
-          if (this.growing) {
-            this.alpha += 0.003;
-            if (this.alpha >= 0.6) this.growing = false;
-          } else {
-            this.alpha -= 0.003;
-            if (this.alpha <= 0.1) this.growing = true;
+        // Disable touch callout only on canvas
+        canvas.style.webkitTouchCallout = "none";
+
+        // Particles
+        (function () {
+          const cv = document.getElementById("particle-canvas"),
+            ctxp = cv.getContext("2d"),
+            pts = [];
+          let raf;
+          function resize() {
+            cv.width = innerWidth;
+            cv.height = innerHeight;
           }
-          if (
-            this.x < 0 ||
-            this.x > canvas.width ||
-            this.y < 0 ||
-            this.y > canvas.height
-          )
-            this.reset();
-        }
-        draw() {
-          ctx.beginPath();
-          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(197, 160, 89, ${this.alpha})`;
-          ctx.fill();
-        }
-      }
-      for (let i = 0; i < particleCount; i++) particles.push(new Particle());
-      function animateParticles() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        particles.forEach((p) => {
-          p.update();
-          p.draw();
-        });
-        requestAnimationFrame(animateParticles);
-      }
-      animateParticles();
-      window.addEventListener("resize", () => {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-      });
-
-      // --- 3. 3D BOOK TILT ---
-      const bookContainer = document.getElementById("book-tilt");
-      const bookCover = document.querySelector(".book-cover");
-      bookContainer.addEventListener("mousemove", (e) => {
-        const rect = bookContainer.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        const xRotation = -10 * ((y - rect.height / 2) / rect.height);
-        const yRotation = 10 * ((x - rect.width / 2) / rect.width);
-        bookCover.style.transform = `rotateX(${xRotation}deg) rotateY(${yRotation}deg)`;
-      });
-      bookContainer.addEventListener("mouseleave", () => {
-        bookCover.style.transform = "rotateX(0deg) rotateY(0deg)";
-      });
-      const observerOptions = { threshold: 0.15 };
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            if (entry.target.classList.contains("fade-in-up")) {
-              entry.target.classList.add("visible");
+          resize();
+          addEventListener("resize", resize);
+          function mkPt() {
+            return {
+              x: Math.random() * cv.width,
+              y: cv.height + 8,
+              vx: (Math.random() - 0.5) * 0.5,
+              vy: -(0.4 + Math.random() * 0.7),
+              r: 0.5 + Math.random() * 1.2,
+              life: 0,
+              max: 160 + Math.random() * 120,
+              peak: 0.12 + Math.random() * 0.18,
+            };
+          }
+          for (let i = 0; i < 45; i++) {
+            const p = mkPt();
+            p.y = Math.random() * cv.height;
+            p.life = Math.random() * p.max;
+            pts.push(p);
+          }
+          function frame() {
+            ctxp.clearRect(0, 0, cv.width, cv.height);
+            for (let p of pts) {
+              p.x += p.vx;
+              p.y += p.vy;
+              p.life++;
+              const t = p.life / p.max;
+              const a =
+                t < 0.15
+                  ? (t / 0.15) * p.peak
+                  : t > 0.85
+                    ? ((1 - t) / 0.15) * p.peak
+                    : p.peak;
+              ctxp.beginPath();
+              ctxp.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+              ctxp.fillStyle = `rgba(201,168,76,${a})`;
+              ctxp.fill();
+              if (p.life >= p.max) pts[pts.indexOf(p)] = mkPt();
             }
+            raf = requestAnimationFrame(frame);
           }
+          frame();
+          window._stopPts = () => cancelAnimationFrame(raf);
+        })();
+
+        addEventListener("load", () => {
+          setTimeout(() => {
+            const l = document.getElementById("loader");
+            l.classList.add("out");
+            setTimeout(() => {
+              l.style.display = "none";
+              document.getElementById("launch").classList.add("visible");
+            }, 800);
+          }, 2600);
         });
-      }, observerOptions);
-      document
-        .querySelectorAll(".fade-in-up")
-        .forEach((el) => observer.observe(el));
 
-      // --- 4. VIDEO PLAYER (UPDATED LOGIC) ---
-      function playVideo() {
-        const wrapper = document.getElementById("video-wrapper");
-        const frame = document.getElementById("youtube-frame");
+        window.openReader = () => {
+          const launch = document.getElementById("launch");
+          launch.style.opacity = "0";
+          setTimeout(() => {
+            launch.style.visibility = "hidden";
+            if (window._stopPts) window._stopPts();
+            const app = document.getElementById("app");
+            app.classList.add("show");
+            requestAnimationFrame(() => {
+              app.classList.add("fade");
+              loadPDF();
+              setTimeout(
+                () => document.getElementById("popup").classList.add("open"),
+                800,
+              );
+            });
+          }, 500);
+        };
+        window.closePopup = () =>
+          document.getElementById("popup").classList.remove("open");
 
-        // If already playing, don't reload
-        if (wrapper.classList.contains("playing")) return;
+        function loadPDF() {
+          pdfjsLib
+            .getDocument("book.pdf")
+            .promise.then((doc) => {
+              pdfDoc = doc;
+              totalPages = doc.numPages;
+              pageNum = 1;
+              document.getElementById("state-loading").style.display = "none";
+              canvas.style.display = "block";
+              document.getElementById("s-tot").textContent = totalPages;
+              document.getElementById("mobile-page-total").textContent =
+                totalPages;
+              document.getElementById("goto-input").max = totalPages;
+              document.getElementById("goto-input").value = pageNum;
+              document.getElementById("mobile-page-input").max = totalPages;
+              document.getElementById("mobile-page-input").value = pageNum;
+              buildDots();
+              renderPage(pageNum);
+              attachSwipe();
+              updateMobileStats();
+            })
+            .catch(() => {
+              document.getElementById("state-loading").style.display = "none";
+              document.getElementById("state-error").style.display = "flex";
+            });
+        }
 
-        wrapper.classList.add("playing");
+        function renderPage(num) {
+          pageRendering = true;
+          pdfDoc
+            .getPage(num)
+            .then((page) => {
+              const area = document.getElementById("canvas-area");
+              const containerWidth = area.clientWidth - 40;
+              const containerHeight = area.clientHeight - 80;
+              const originalViewport = page.getViewport({ scale: 1 });
+              const fitScale = Math.min(
+                containerWidth / originalViewport.width,
+                containerHeight / originalViewport.height,
+              );
+              const finalScale = fitScale * renderQuality;
+              const viewport = page.getViewport({ scale: finalScale });
+              canvas.width = viewport.width;
+              canvas.height = viewport.height;
+              canvas.style.width = originalViewport.width * fitScale + "px";
+              canvas.style.height = originalViewport.height * fitScale + "px";
+              const renderContext = {
+                canvasContext: ctx,
+                viewport: viewport,
+                intent: "print",
+              };
+              const renderTask = page.render(renderContext);
+              renderTask.promise.then(() => {
+                pageRendering = false;
+                if (pageNumPending !== null) {
+                  renderPage(pageNumPending);
+                  pageNumPending = null;
+                }
+                pageNum = num;
+                updateUI();
+              });
+            })
+            .catch(() => {
+              pageRendering = false;
+            });
+        }
 
-        // CLEANEST URL PARAMETERS:
-        // autoplay=1  -> Starts automatically
-        // mute=1      -> REQUIRED for autoplay
-        // controls=1  -> Shows the time bar (user requested)
-        // loop=1      -> Replays automatically
-        // playlist=ID -> Required for loop to work
-        // modestbranding=1 -> Smaller logo
-        // rel=0       -> No random related videos
-        // color=white -> White timeline instead of red
+        function queueRenderPage(num) {
+          if (pageRendering) pageNumPending = num;
+          else renderPage(num);
+        }
 
-        // NEW VIDEO ID FROM: https://youtu.be/Myrg2RrorLE
-        const videoID = "Myrg2RrorLE";
+        window.sharpenText = (delta) => {
+          renderQuality = Math.max(
+            1.5,
+            Math.min(3.5, renderQuality + delta * 0.5),
+          );
+          queueRenderPage(pageNum);
+        };
 
-        frame.src = `https://www.youtube.com/embed/${videoID}?autoplay=1&mute=1&controls=1&loop=1&playlist=${videoID}&modestbranding=1&rel=0&iv_load_policy=3&color=white`;
-      }
+        function updateUI() {
+          const pct = Math.round((pageNum / totalPages) * 100);
+          document.getElementById("s-cur").textContent = pageNum;
+          document.getElementById("s-rem").textContent = totalPages - pageNum;
+          document.getElementById("s-pct").textContent = pct + "%";
+          document.getElementById("prog").style.width = pct + "%";
+          document.getElementById("foot-right").textContent = pct + "% read";
+          document.getElementById("btn-prev").disabled = pageNum <= 1;
+          document.getElementById("btn-next").disabled = pageNum >= totalPages;
+          document.getElementById("goto-input").value = pageNum;
+          document.getElementById("mobile-page-input").value = pageNum;
+          updateDots();
+          updateMobileStats();
+          document.getElementById("canvas-area").scrollTop = 0;
+        }
 
-      // --- 5. DETECT WHEN VIDEO IS VISIBLE TO AUTO-PLAY ---
-      const videoObserver = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            // If 40% of the video is visible, start playing
-            if (entry.isIntersecting) {
-              playVideo();
-              videoObserver.unobserve(entry.target); // Stop checking once started
+        function buildDots() {
+          const c = document.getElementById("dots");
+          c.innerHTML = "";
+          for (let i = 0; i < Math.min(totalPages, 10); i++) {
+            const d = document.createElement("div");
+            d.className = "dot";
+            c.appendChild(d);
+          }
+        }
+        function updateDots() {
+          const dots = document.querySelectorAll(".dot");
+          if (!dots.length) return;
+          const idx = Math.round(
+            ((pageNum - 1) / Math.max(totalPages - 1, 1)) * (dots.length - 1),
+          );
+          dots.forEach((d, i) => d.classList.toggle("on", i === idx));
+        }
+        function updateMobileStats() {
+          const mob = document.getElementById("mobileStats");
+          if (mob && totalPages) {
+            mob.innerHTML = `<div class="stat-row"><span class="stat-key">Page</span><span class="stat-val g">${pageNum}/${totalPages}</span></div><div class="stat-row"><span class="stat-key">Remaining</span><span class="stat-val">${totalPages - pageNum}</span></div><div class="stat-row"><span class="stat-key">Progress</span><span class="stat-val g">${Math.round((pageNum / totalPages) * 100)}%</span></div>`;
+          }
+        }
+
+        window.changePage = (d) => {
+          const n = pageNum + d;
+          if (n < 1 || n > totalPages || pageRendering) return;
+          pageNum = n;
+          queueRenderPage(pageNum);
+        };
+
+        window.gotoPage = () => {
+          const v = parseInt(document.getElementById("goto-input").value);
+          if (isNaN(v) || v < 1 || v > totalPages) return;
+          pageNum = v;
+          queueRenderPage(pageNum);
+        };
+
+        document
+          .getElementById("mobile-page-input")
+          .addEventListener("change", function () {
+            const v = parseInt(this.value);
+            if (isNaN(v) || v < 1 || v > totalPages) {
+              this.value = pageNum;
+              return;
+            }
+            pageNum = v;
+            queueRenderPage(pageNum);
+          });
+        document
+          .getElementById("mobile-page-input")
+          .addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+              e.target.blur();
             }
           });
-        },
-        { threshold: 0.4 }
-      );
 
-      const videoSection = document.getElementById("video-wrapper");
-      if (videoSection) videoObserver.observe(videoSection);
+        addEventListener("keydown", (e) => {
+          if (!pdfDoc) return;
+          if (e.key === "ArrowRight" || e.key === "ArrowDown") changePage(1);
+          if (e.key === "ArrowLeft" || e.key === "ArrowUp") changePage(-1);
+        });
+        document
+          .getElementById("goto-input")
+          .addEventListener("keydown", (e) => {
+            if (e.key === "Enter") gotoPage();
+          });
+
+        function attachSwipe() {
+          const area = document.getElementById("canvas-area");
+          let sx = 0;
+          area.addEventListener(
+            "touchstart",
+            (e) => (sx = e.changedTouches[0].screenX),
+            { passive: true },
+          );
+          area.addEventListener("touchend", (e) => {
+            if (!pdfDoc || pageRendering) return;
+            const dx = e.changedTouches[0].screenX - sx;
+            if (Math.abs(dx) > 50) changePage(dx < 0 ? 1 : -1);
+          });
+        }
+
+        window.toggleMobileMenu = () => {
+          document.getElementById("mobileMenu").classList.toggle("open");
+          document.getElementById("menuOverlay").classList.toggle("show");
+        };
+        window.closeMobileMenu = () => {
+          document.getElementById("mobileMenu").classList.remove("open");
+          document.getElementById("menuOverlay").classList.remove("show");
+        };
+
+        window.sharePage = () => {
+          const url = "https://loser-am-i.pgtglobalnetwork.com/";
+          if (navigator.share) {
+            navigator
+              .share({
+                title: "Loser, Am I? — Beyond Winning and Losing",
+                text: 'Discover the power of thought and identity. "Loser, Am I?" by Pranav Gujar.',
+                url: url,
+              })
+              .catch(() => {});
+          } else {
+            prompt("Copy this link to share:", url);
+          }
+        };
+
+        window.openFeedback = () => {
+          document.getElementById("feedbackPage").style.display = "flex";
+          document.getElementById("feedbackFrame").src =
+            "https://docs.google.com/forms/d/e/1FAIpQLSfUln-TnKdmoEcBQG6lvdmpZE7Ajr8ZC7bJ3L66F7AumqD-xg/viewform?embedded=true";
+          closeMobileMenu();
+        };
+        window.closeFeedback = () => {
+          document.getElementById("feedbackPage").style.display = "none";
+          document.getElementById("feedbackFrame").src = "about:blank";
+        };
+
+        let rt;
+        window.addEventListener("resize", () => {
+          clearTimeout(rt);
+          rt = setTimeout(() => {
+            if (pdfDoc && !pageRendering) renderPage(pageNum);
+          }, 150);
+        });
+      })();
     </script>
   </body>
 </html>
